@@ -74,9 +74,9 @@ impl StellarInvoiceContract {
     // Create invoice and return id
     pub fn create_invoice(env: Env, issuer: Address, payer: Address, amount: i128, currency: Symbol, due_date: u64) -> u64 {
         // increment counter
-        let mut counter = env.storage().get(&COUNTER_KEY).unwrap_or(Ok(0_u64)).unwrap();
+        let mut counter = Self::get_counter(&env);
         counter += 1;
-        env.storage().set(&COUNTER_KEY, &counter);
+        Self::set_counter(&env, counter);
 
         let created_at = env.ledger().timestamp();
 
