@@ -39,51 +39,35 @@ pub struct StellarInvoiceContract;
 
 
 impl StellarInvoiceContract {
-    fn make_invoice_key(id: u64) -> String {
-        let mut s = String::from(PREFIX_INVOICE);
-        s.push_str(&id.to_string());
-        s
-    }
-
-    fn make_addr_idx_key(addr: &Address) -> String {
-        let mut s = String::from(PREFIX_ADDR_IDX);
-        s.push_str(&format!("{:?}", addr));
-        s
-    }
-
     fn get_counter(env: &Env) -> u64 {
-        env.storage()
-            .get(&COUNTER_KEY)
-            .unwrap_or(Ok(0_u64))
-            .unwrap()
+        env.storage().instance().get(&DataKey::Counter).unwrap_or(0_u64)
     }
 
     fn set_counter(env: &Env, v: u64) {
-        env.storage().set(&COUNTER_KEY, &v);
+        env.storage().instance().set(&DataKey::Counter, &v);
     }
 
     fn store_invoice(env: &Env, invoice: &Invoice) {
-        let key = Self::make_invoice_key(invoice.id);
-        env.storage().set(&key, invoice);
+        env.storage().persistent().set(&DataKey::Invoice(invoice.id), invoice);
     }
 
     fn load_invoice(env: &Env, id: u64) -> Option<Invoice> {
-        let key = Self::make_invoice_key(id);
-        env.storage().get(&key)
+        env.storage().persistent().get(&DataKey::Invoice(id))
     }
 
     fn push_invoice_to_address(env: &Env, addr: &Address, id: u64) {
-        let key = Self::make_addr_idx_key(addr);
-        let mut list: Vec<u64> = env.storage().get(&key).unwrap_or(Ok(Vec::new(env))).unwrap();
+        let key = DataKey::AddrIdx(addr.clone());
+        let mut list: Vec<u64> = env.storage().persistent().get(&key).unwrap_or_else(|| Vec::new(env));
         list.push_back(id);
-        env.storage().set(&key, &list);
+        env.storage().persistent().set(&key, &list);
     }
 
     fn get_invoices_for_address(env: &Env, addr: &Address) -> Vec<u64> {
-        let key = Self::make_addr_idx_key(addr);
-        env.storage().get(&key).unwrap_or(Ok(Vec::new(env))).unwrap()
+        let key = DataKey::AddrIdx(addr.clone());
+        env.storage().persistent().get(&key).unwrap_or_else(|| Vec::new(env))
     }
 }
+
 
 #[contractimpl]
 impl StellarInvoiceContract {
