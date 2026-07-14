@@ -1,10 +1,10 @@
 #![no_std]
 
-use soroban_sdk::{contractimpl, symbol, Address, Env, Symbol, Vec, BytesN};
-use soroban_sdk::serde::{Deserialize, Serialize};
+use soroban_sdk::{contractimpl, contracttype, symbol_short, symbol, Address, Env, Symbol, Vec, BytesN};
 
 // Invoice status
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[contracttype]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Status {
     Created,
     PartiallyPaid,
@@ -13,7 +13,8 @@ pub enum Status {
     Cancelled,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[contracttype]
+#[derive(Clone, Debug)]
 pub struct Invoice {
     pub id: u64,
     pub issuer: Address,
@@ -26,12 +27,16 @@ pub struct Invoice {
     pub paid_amount: i128,
 }
 
-// Storage keys (instance/persistent) - using simple string-based keys that implement IntoVal
-const COUNTER_KEY: &str = "INVOICE_COUNTER";
-const PREFIX_INVOICE: &str = "INVOICE:";
-const PREFIX_ADDR_IDX: &str = "ADDR_IDX:"; // mapping address -> Vec<u64>
+#[contracttype]
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum DataKey {
+    Counter,
+    Invoice(u64),
+    AddrIdx(Address),
+}
 
 pub struct StellarInvoiceContract;
+
 
 impl StellarInvoiceContract {
     fn make_invoice_key(id: u64) -> String {
