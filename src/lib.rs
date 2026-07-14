@@ -1,6 +1,6 @@
 #![no_std]
 
-use soroban_sdk::{contractimpl, contracttype, symbol_short, symbol, Address, Env, Symbol, Vec, BytesN};
+use soroban_sdk::{contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec};
 
 // Invoice status
 #[contracttype]
@@ -98,7 +98,7 @@ impl StellarInvoiceContract {
         StellarInvoiceContract::push_invoice_to_address(&env, &payer, invoice.id);
 
         // emit event
-        env.events().publish((symbol!("Invoice"), symbol!("Created")), (invoice.id, issuer, payer, amount, currency, due_date));
+        env.events().publish((symbol_short!("Invoice"), symbol_short!("Created")), (invoice.id, issuer, payer, amount, currency, due_date));
 
         invoice.id
     }
@@ -132,7 +132,7 @@ impl StellarInvoiceContract {
 
         StellarInvoiceContract::store_invoice(&env, &invoice);
 
-        env.events().publish((symbol!("Invoice"), symbol!("Paid")), (invoice.id, payer, amount, invoice.paid_amount, invoice.status));
+        env.events().publish((symbol_short!("Invoice"), symbol_short!("Paid")), (invoice.id, payer, amount, invoice.paid_amount, invoice.status));
     }
 
     pub fn get_invoice(env: Env, invoice_id: u64) -> Invoice {
@@ -149,7 +149,7 @@ impl StellarInvoiceContract {
         }
         invoice.status = Status::Cancelled;
         StellarInvoiceContract::store_invoice(&env, &invoice);
-        env.events().publish((symbol!("Invoice"), symbol!("Cancelled")), (invoice.id, issuer));
+        env.events().publish((symbol_short!("Invoice"), symbol_short!("Cancelled")), (invoice.id, issuer));
     }
 
     pub fn list_invoices_by_address(env: Env, addr: Address) -> Vec<u64> {
@@ -162,7 +162,7 @@ impl StellarInvoiceContract {
         if invoice.status != Status::Paid && invoice.status != Status::Cancelled && ts > invoice.due_date {
             invoice.status = Status::Overdue;
             StellarInvoiceContract::store_invoice(&env, &invoice);
-            env.events().publish((symbol!("Invoice"), symbol!("Overdue")), (invoice.id, invoice.due_date, ts));
+            env.events().publish((symbol_short!("Invoice"), symbol_short!("Overdue")), (invoice.id, invoice.due_date, ts));
         }
     }
 }
