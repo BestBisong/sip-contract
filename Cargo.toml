@@ -1,0 +1,16 @@
+[package]
+name = "stellar-invoice-protocol"
+version = "0.1.0"
+edition = "2021"
+description = "Stellar Invoice Protocol - Soroban smart contract"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+soroban-sdk = "0.22.0"
+serde = { version = "1.0", features = ["derive"] }
+
+[dev-dependencies]
+soroban-sdk = { version = "0.22.0", features = ["testutils"] }
