@@ -1,6 +1,6 @@
 #![no_std]
 
-use soroban_sdk::{contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec};
+use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec};
 
 // Invoice status
 #[contracttype]
@@ -35,6 +35,7 @@ pub enum DataKey {
     AddrIdx(Address),
 }
 
+#[contract]
 pub struct StellarInvoiceContract;
 
 
